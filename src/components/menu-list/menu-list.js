@@ -7,9 +7,15 @@ class MenuList extends Component {
 
     render() {
 
+        const {menuItems} = this.props;
+
         return (
             <ul className="menu__list">
-                <MenuListItem/>
+                {
+                    menuItems.map(menuItems => {
+                        return <MenuListItem key={menuItems.id} menuItems={menuItems}/>
+                    })
+                }
             </ul>
         )
     }

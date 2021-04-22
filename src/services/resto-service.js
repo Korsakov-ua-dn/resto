@@ -1,5 +1,6 @@
 export default class RestoService {
-    getMenuItems() {
-        return [];
+    async getMenuItems() {
+        const res = await fetch('http://localhost:3004/menu');
+        return res.json();
     }
 }
