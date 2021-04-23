@@ -1,19 +1,35 @@
 import React, {Component} from 'react';
 import MenuListItem from '../menu-list-item';
+import {connect} from 'react-redux'; // функция connect это HOC
+import WithRestoService from '../hoc';
+import {menuLoaded, menuRequested} from '../../actions';
+import Spinner from '../spinner';
 
 import './menu-list.scss';
 
 class MenuList extends Component {
 
+    componentDidMount() {
+        this.props.menuRequested();
+
+        const {RestoService} = this.props;
+        RestoService.getMenuItems()
+        .then(res => this.props.menuLoaded(res));
+    }
+
     render() {
 
-        const {menuItems} = this.props;
+        const {menuItems, loading} = this.props;
+
+        if (loading) {
+            return <Spinner/>
+        }
 
         return (
             <ul className="menu__list">
                 {
-                    menuItems.map(menuItems => {
-                        return <MenuListItem key={menuItems.id} menuItems={menuItems}/>
+                    menuItems.map(menuItem => {
+                        return <MenuListItem key={menuItem.id} menuItem={menuItem}/>
                     })
                 }
             </ul>
@@ -21,5 +37,24 @@ class MenuList extends Component {
     }
 };
 
+const mapStateToProps = (state) => {
+    return {
+        menuItems: state.menu,
+        loading: state.loading
+    }
+}
 
-export default MenuList;
+// const mapDispatchToProps = (dispatch) => {
+//     return {
+//         menuLoaded: (newMenu) => {
+//             dispatch(menuLoaded(newMenu))
+//         }
+//     }
+// } равносильно этому благодаря встренным особенностям connect
+
+const mapDispatchToProps = {
+    menuLoaded,
+    menuRequested
+};
+
+export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(MenuList)); // connect функция позволяет связать компонент с Redux, композиция компонентов высшего порядка
