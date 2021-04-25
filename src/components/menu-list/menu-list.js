@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import MenuListItem from '../menu-list-item';
 import {connect} from 'react-redux'; // функция connect это HOC
 import WithRestoService from '../hoc';
-import {menuLoaded, menuRequested} from '../../actions';
+import {menuLoaded, menuRequested, menuError} from '../../actions';
 import Spinner from '../spinner';
+import Error from '../error';
 
 import './menu-list.scss';
 
@@ -14,33 +15,46 @@ class MenuList extends Component {
 
         const {RestoService} = this.props;
         RestoService.getMenuItems()
-        .then(res => this.props.menuLoaded(res));
+        .then(res => this.props.menuLoaded(res))
+        .catch(res => this.props.menuError(res));
     }
 
     render() {
 
-        const {menuItems, loading} = this.props;
+        const {menuItems, loading, error} = this.props;
 
-        if (loading) {
-            return <Spinner/>
-        }
+        const errorMessage = error ? <Error/> : null;
+        const spinner = loading ? <Spinner/> : null;
+        const content = !(error || loading) ? <View menuItems={menuItems}/> : null;
 
         return (
-            <ul className="menu__list">
-                {
-                    menuItems.map(menuItem => {
-                        return <MenuListItem key={menuItem.id} menuItem={menuItem}/>
-                    })
-                }
-            </ul>
+           <div>
+                {errorMessage}
+                {spinner}
+                {content}
+           </div>
         )
     }
 };
 
+
+const View = ({menuItems}) => {
+    return (
+        <ul className="menu__list">
+            {
+                menuItems.map(menuItem => {
+                    return <MenuListItem key={menuItem.id} menuItem={menuItem}/>
+                })
+            }
+        </ul>
+    )
+}
+
 const mapStateToProps = (state) => {
     return {
         menuItems: state.menu,
-        loading: state.loading
+        loading: state.loading,
+        error: state.error
     }
 }
 
@@ -54,7 +68,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     menuLoaded,
-    menuRequested
+    menuRequested,
+    menuError
 };
 
 export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(MenuList)); // connect функция позволяет связать компонент с Redux, композиция компонентов высшего порядка
