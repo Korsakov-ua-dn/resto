@@ -1,6 +1,6 @@
 export default class RestoService {
 
-    _apiBase = 'http://localhost:3004';
+    _apiBase = 'http://localhost:3000';
 
     async getResource(url) {
         
