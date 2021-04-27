@@ -29,11 +29,25 @@ const reducer = (state = initialState, action) => {
         case 'ITEM_ADD_TO_CART':
             const id = action.payload;
             const item = state.menu.find(item => item.id === id);
+            const double = state.items.find(elem => elem.id === item.id); // true or false
+            if (double) {
+                const x = state.items.findIndex(elem => elem.id === id)
+
+                const doubleItem = {...state.items[x], count: }
+                return {
+                    ...state,
+                    items: [
+                        ...state.items.slice(0, x),
+                        ...state.items.slice(x + 1)
+                    ]
+                }
+            }
             const newItem = {
                 title: item.title,
                 price: item.price,
                 url: item.url,
-                id: item.id
+                id: item.id,
+                count: 1
             }
             return {
                 ...state,
