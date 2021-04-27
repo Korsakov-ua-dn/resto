@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import MenuListItem from '../menu-list-item';
 import {connect} from 'react-redux'; // функция connect это HOC
 import WithRestoService from '../hoc';
-import {menuLoaded, menuRequested, menuError} from '../../actions';
+import {menuLoaded, menuRequested, menuError, addedToCart} from '../../actions';
 import Spinner from '../spinner';
 import Error from '../error';
 
@@ -21,11 +21,13 @@ class MenuList extends Component {
 
     render() {
 
-        const {menuItems, loading, error} = this.props;
+        const {menuItems, loading, error, addedToCart} = this.props;
 
         const errorMessage = error ? <Error/> : null;
         const spinner = loading ? <Spinner/> : null;
-        const content = !(error || loading) ? <View menuItems={menuItems}/> : null;
+        const content = !(error || loading) ? <View
+                                                    addedToCart={addedToCart}
+                                                    menuItems={menuItems}/> : null;
 
         return (
            <div>
@@ -38,12 +40,14 @@ class MenuList extends Component {
 };
 
 
-const View = ({menuItems}) => {
+const View = ({menuItems, addedToCart}) => {
     return (
         <ul className="menu__list">
             {
                 menuItems.map(menuItem => {
-                    return <MenuListItem key={menuItem.id} menuItem={menuItem}/>
+                    return <MenuListItem onAddToCart={() => addedToCart(menuItem.id)}
+                                         key={menuItem.id}
+                                         menuItem={menuItem}/>
                 })
             }
         </ul>
@@ -69,7 +73,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     menuLoaded,
     menuRequested,
-    menuError
+    menuError,
+    addedToCart
 };
 
 export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(MenuList)); // connect функция позволяет связать компонент с Redux, композиция компонентов высшего порядка

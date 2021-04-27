@@ -2,22 +2,7 @@ const initialState = {
     menu: [],
     loading: true,
     error: false,
-    items: [
-        {
-			"title": "Cesar salad",
-			"price": 12,
-			"url": "https://static.1000.menu/img/content/21458/-salat-cezar-s-kr-salat-cezar-s-krevetkami-s-maionezom_1501173720_1_max.jpg",
-			"category": "salads",
-			"id": 1
-		},
-		{
-			"title": "Pizza Margherita",
-			"price": 10,
-			"url": "https://attuale.ru/wp-content/uploads/2018/04/6eaa1be0f1976c5f5a5f2d2b3ae42fc8.jpg",
-			"category": "pizza",
-			"id": 2
-		}
-    ]
+    items: []
 }
 
 const reducer = (state = initialState, action) => {
@@ -40,6 +25,32 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 loading: false,
                 error: true
+            };
+        case 'ITEM_ADD_TO_CART':
+            const id = action.payload;
+            const item = state.menu.find(item => item.id === id);
+            const newItem = {
+                title: item.title,
+                price: item.price,
+                url: item.url,
+                id: item.id
+            }
+            return {
+                ...state,
+                items: [
+                    ...state.items,
+                    newItem
+                ]
+            };
+        case 'ITEM_REMOVE_FROM_CART':
+            const idx = action.payload;
+            const itemIndex = state.items.findIndex(item => item.id === idx);
+            return {
+                ...state,
+                items: [
+                    ...state.items.slice(0, itemIndex),
+                    ...state.items.slice(itemIndex + 1)
+                ]
             };
         default:
             return state;
