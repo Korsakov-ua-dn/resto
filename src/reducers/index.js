@@ -2,7 +2,8 @@ const initialState = {
     menu: [],
     loading: true,
     error: false,
-    items: []
+    items: [],
+    total: 0
 }
 
 const reducer = (state = initialState, action) => {
@@ -30,16 +31,20 @@ const reducer = (state = initialState, action) => {
             const id = action.payload;
             const item = state.menu.find(item => item.id === id);
             const double = state.items.find(elem => elem.id === item.id); // true or false
-            if (double) {
-                const x = state.items.findIndex(elem => elem.id === id)
 
-                const doubleItem = {...state.items[x], count: }
+            if (double) {
+                const x = state.items.findIndex(elem => elem.id === id);
+                const doubleItem = {...state.items[x], count: state.items[x].count + 1}; // взять все свойства, а count поменять
+                const total = state.total + item.price;
+
                 return {
                     ...state,
                     items: [
                         ...state.items.slice(0, x),
+                        doubleItem,
                         ...state.items.slice(x + 1)
-                    ]
+                    ],
+                    total: total
                 }
             }
             const newItem = {
@@ -48,23 +53,28 @@ const reducer = (state = initialState, action) => {
                 url: item.url,
                 id: item.id,
                 count: 1
-            }
+            };  
+            const total = state.total + item.price;
             return {
                 ...state,
                 items: [
                     ...state.items,
                     newItem
-                ]
+                ],
+                total: total
             };
         case 'ITEM_REMOVE_FROM_CART':
             const idx = action.payload;
             const itemIndex = state.items.findIndex(item => item.id === idx);
+            const removeTotal = state.total - state.items[itemIndex].price*state.items[itemIndex].count;
+
             return {
                 ...state,
                 items: [
                     ...state.items.slice(0, itemIndex),
                     ...state.items.slice(itemIndex + 1)
-                ]
+                ],
+                total: removeTotal
             };
         default:
             return state;
